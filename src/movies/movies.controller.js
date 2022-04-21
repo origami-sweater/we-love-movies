@@ -6,9 +6,19 @@ async function idExists(req, res, next){
     const movie = await moviesService.readMovie(req.params.movieId);
     if(movie){
         res.locals.movie = movie;
+        res.locals.id = movie.movie_id;
         return next();
     };
     next({status: 404, message: "Movie cannot be found."});
+}
+
+async function theatersExist(req, res, next){
+    const theaters = await moviesService.readTheaters(res.locals.id);
+    if(theaters){
+        res.locals.theaters = theaters;
+        return next();
+    };
+    next({status: 404, message: "No showings can be found."});
 }
 
 
@@ -23,7 +33,13 @@ function readMovie(req, res){
     res.json({ data });
 }
 
+function readTheaters(req, res){
+    const { theaters: data } = res.locals;
+    res.json({ data });
+}
+
 module.exports = {
     list: asyncErrorBoundary(list),
-    readMovie: [idExists, asyncErrorBoundary(readMovie)],
+    readMovie: [asyncErrorBoundary(idExists), readMovie],
+    readTheaters: [asyncErrorBoundary(idExists), asyncErrorBoundary(theatersExist), readTheaters],
 }
