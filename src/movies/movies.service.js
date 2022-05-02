@@ -1,4 +1,11 @@
 const knex = require("../db/connection");
+const reduceProperties = require("../utils/reduce-properties")
+
+const addCritic = reduceProperties("critic_id", {
+    preferred_name: ["critic", null, "preferred_name"],
+    surname: ["critic", null,"surname"],
+    organization_name: ["critic", null,"organization_name"]
+});
 
 function list(){
     return knex("movies").select("*");
@@ -24,9 +31,18 @@ function readTheaters(movie_id){
         .where({"mt.movie_id": movie_id})
 }
 
+function readReviews(movie_id){
+    return knex("reviews as r")
+        .join("critics as critic", "r.critic_id", "critic.critic_id")
+        .select("r.*", "critic.*")
+        .where({"r.movie_id": movie_id})
+        .then(addCritic)
+}
+
 module.exports = {
     list,
     listMoviesShowing,
     readMovie,
     readTheaters,
+    readReviews,
 }

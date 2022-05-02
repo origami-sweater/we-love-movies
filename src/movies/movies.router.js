@@ -1,12 +1,14 @@
 const router = require("express").Router();
 const controller = require("./movies.controller");
 
-//STILL NEEDS FROM MOVIES LIST: ?IS_SHOWING=TRUE 
+router 
+    .route("/:movieId/reviews")
+    .get(controller.readReviews)
 
 router
     .route("/:movieId/theaters")
     .get(controller.readTheaters)
-    
+
 router
     .route("/:movieId")
     .get(controller.readMovie)
